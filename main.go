@@ -36,7 +36,7 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{
 			"message":       "welcome to my webhook :)",
-			"response_time": time.Since(t),
+			"response_time": time.Since(t).String(),
 		})
 	})
 
