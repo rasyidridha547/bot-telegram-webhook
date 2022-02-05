@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/rasyidridha532/bot-telegram-webhook/controllers"
 	"log"
@@ -12,6 +11,9 @@ import (
 func main() {
 	// get port from env
 	port := controllers.DotEnvVar("PORT")
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
 
 	// initiate Gin
 	r := gin.Default()
@@ -38,7 +40,7 @@ func main() {
 		})
 	})
 
-	err := r.Run(fmt.Sprintf(":%s", port))
+	err := r.Run(":" + port)
 	if err != nil {
 		log.Fatal(err)
 	}
