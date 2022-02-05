@@ -20,7 +20,7 @@ func DotEnvVar(key string) string {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatal("error load .env file")
+		fmt.Println("error load .env file")
 	}
 
 	return os.Getenv(key)
