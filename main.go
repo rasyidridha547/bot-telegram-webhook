@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/rasyidridha532/bot-telegram-webhook/controllers"
 	"log"
@@ -18,8 +19,10 @@ func main() {
 	// initiate Gin
 	r := gin.Default()
 
+	// ::port/api
 	api := r.Group("/api")
 
+	// ::port/api/v1
 	v1 := api.Group("/v1")
 	v1.GET("/profile", controllers.Profile)
 	v1.GET("/message", controllers.IncomingWebhook)
@@ -40,7 +43,7 @@ func main() {
 		})
 	})
 
-	err := r.Run(":" + port)
+	err := r.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatal(err)
 	}
