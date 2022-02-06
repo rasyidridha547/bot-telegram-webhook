@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 	"github.com/joho/godotenv"
+	"github.com/rasyidridha532/bot-telegram-webhook/helper"
 	"github.com/rasyidridha532/bot-telegram-webhook/models"
 	"log"
 	"net/http"
@@ -26,39 +26,29 @@ func DotEnvVar(key string) string {
 	return os.Getenv(key)
 }
 
-func decodejson(resp *resty.Response) map[string]interface{} {
-	var response map[string]interface{}
-
-	err := json.Unmarshal(resp.Body(), &response)
-	if err != nil {
-		return nil
-	}
-
-	if response == nil {
-		fmt.Println("error json unmarshal")
-	}
-
-	return response
-}
-
 func Profile(c *gin.Context) {
 	token := models.Token{}
 
+	// bind payload body
 	err := c.BindJSON(&token)
 	if err != nil {
-		log.Fatal(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "error",
+			"reason":  err,
+		})
+		return
 	}
 
 	//url := baseUrl + DotEnvVar("BOT_TOKEN") + "/getMe"
 	url := baseUrl + token.BotToken + "/getMe"
 	t := time.Now()
 
-	resp, err := client.R().EnableTrace().Get(url)
+	resp, err := client.R().Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	response := decodejson(resp)
+	response := helper.Decode(resp)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":       "success",
@@ -75,5 +65,40 @@ func IncomingWebhook(c *gin.Context) {
 }
 
 func SendMessage(c *gin.Context) {
+	token := &models.Token{}
+	message := &models.Message{}
 
+	// bind payload body
+	err := c.BindJSON(&token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "error",
+			"reason":  err,
+		})
+		return
+	}
+
+	t := time.Now()
+
+	url := baseUrl + token.BotToken + "/sendMessage"
+
+	_, err = client.R().
+		SetQueryParams(map[string]string{
+			"chat_id": message.ChatID,
+			"text":    message.Text,
+		}).
+		Post(url)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "error",
+			"reason":  err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":        "success",
+		"message":       "sukses mengirim pesan",
+		"response_time": time.Since(t).String(),
+	})
 }
