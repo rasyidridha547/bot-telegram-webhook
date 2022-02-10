@@ -1,10 +1,11 @@
 package models
 
 type Message struct {
-	Text   string `json:"text"`
-	ChatID string `json:"chat_id"`
+	BotToken string `json:"bot_token" binding:"required"`
+	Text     string `json:"text"`
+	ChatID   string `json:"chat_id" binding:"required"`
 }
 
-type Token struct {
-	BotToken string `json:"token"`
+type BotToken struct {
+	BotToken string `json:"bot_token" binding:"required"`
 }
