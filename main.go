@@ -2,24 +2,32 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rasyidridha532/bot-telegram-webhook/controllers"
-	"github.com/rasyidridha532/bot-telegram-webhook/helper"
 )
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(err)
+	}
+}
 
 func main() {
 	// get port from env
-	port := helper.DotEnvVar("PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
 
-	env := helper.DotEnvVar("GO_ENV")
+	env := os.Getenv("GO_ENV")
 	if env == "release" {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
@@ -38,6 +46,8 @@ func main() {
 	v1 := api.Group("/v1")
 	v1.GET("/profile", controllers.Profile)
 	v1.POST("/webhook", controllers.IncomingWebhook)
+	v1.POST("/google-alert", controllers.GoogleWebhook)
+	v1.POST("/datadog-alert", controllers.DatadogWebhook)
 	v1.POST("/message", controllers.SendMessage)
 
 	r.NoRoute(func(c *gin.Context) {

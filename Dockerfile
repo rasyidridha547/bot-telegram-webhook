@@ -2,7 +2,7 @@
 
 FROM golang:1.17-alpine AS build
 
-RUN apk update && apk add --no-cache git
+RUN apk update && apk add --no-cache git && apk add tzdata
 
 # Create appuser.
 ENV USER=appuser
